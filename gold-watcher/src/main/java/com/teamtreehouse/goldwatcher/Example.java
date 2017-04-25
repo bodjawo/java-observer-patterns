@@ -2,6 +2,7 @@ package com.teamtreehouse.goldwatcher;
 
 import com.teamtreehouse.goldwatcher.tools.LedLight;
 import com.teamtreehouse.goldwatcher.tools.MegaTron;
+import com.teamtreehouse.goldwatcher.tools.Tweeter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +16,16 @@ public class Example {
         MegaTron megaTron = new MegaTron();
         LedLight light = new LedLight();
         Map<String, String[]> colorsByCountry = getColorsByCountry();
+
+        reporter.addObserver("tweet",
+                country -> Tweeter.tweet(country + " just won the Gold!"));
+
+        reporter.addObserver("megatron", megaTron::display);
+
+        reporter.addObserver("lights",
+                country -> light
+                        .flashColors(colorsByCountry.get(country)));
+
         reporter.reportWin("USA");
     }
 

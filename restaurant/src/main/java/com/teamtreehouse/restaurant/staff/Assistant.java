@@ -3,6 +3,11 @@ package com.teamtreehouse.restaurant.staff;
 import com.teamtreehouse.restaurant.tables.Status;
 import com.teamtreehouse.restaurant.tables.Table;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Observable;
+import java.util.Optional;
+
 import static com.teamtreehouse.restaurant.core.Utilities.passTime;
 
 public class Assistant extends Employee {
@@ -18,5 +23,14 @@ public class Assistant extends Employee {
             announce("Clink clink, wipe wipe. I cleaned table #%d", table.getPositionNumber());
             table.setStatus(Status.AVAILABLE);
         });
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        Table table = (Table) o;
+
+        if (table.getStatus() == Status.NEEDS_BUSSING) {
+            busTable(table);
+        }
     }
 }

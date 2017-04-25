@@ -2,8 +2,10 @@ package com.teamtreehouse.restaurant;
 
 import com.teamtreehouse.restaurant.staff.Assistant;
 import com.teamtreehouse.restaurant.staff.Server;
+import com.teamtreehouse.restaurant.tables.Status;
 import com.teamtreehouse.restaurant.tables.Table;
 import com.teamtreehouse.restaurant.tools.Dashboard;
+import com.teamtreehouse.restaurant.tools.Pager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,42 +37,27 @@ public class Simulator {
 
         List<Assistant> assistants = Arrays.asList(charlie, darla);
 
-        int numberOfIterations = 30;
-        for (int counter = 0; counter < numberOfIterations; counter++) {
-            Optional<Server> server = servers.stream()
-                    .filter(Server::isAvailable)
-                    .findAny();
-            Optional<Assistant> assistant = assistants.stream()
-                    .filter(Assistant::isAvailable)
-                    .findAny();
-            if (server.isPresent()) {
-                server.get().refreshDashboard(dashboard);
-            } else if (assistant.isPresent()) {
-                assistant.get().refreshDashboard(dashboard);
-            }
-            for (Table table : tables) {
-                switch (table.getStatus()) {
-                    case AVAILABLE:
-                        if (server.isPresent()) {
-                            server.get().leadToTable(table);
-                        }
-                        break;
-                    case FINISHED:
-                        if (server.isPresent()) {
-                            server.get().closeOutTable(table);
-                        }
-                        break;
-                    case NEEDS_BUSSING:
-                        if (assistant.isPresent()) {
-                            assistant.get().busTable(table);
-                        }
-                        break;
-                }
-            }
-            passTime(1);
-        }
+        tables.forEach(table -> table.addObserver(dashboard));
+        table1.addObserver(alice);
+        table1.addObserver(charlie);
+        table2.addObserver(alice);
+        table2.addObserver(charlie);
+        table3.addObserver(alice);
+        table3.addObserver(charlie);
+        table4.addObserver(bob);
+        table4.addObserver(darla);
+        table5.addObserver(bob);
+        table5.addObserver(darla);
+
+        tables.forEach(table -> new Pager(table));
+
+        tables.forEach(table -> table.setStatus(Status.AVAILABLE));
+        passTime(30);
         System.out.println("Closing up shop");
+        tables.forEach(table -> table.deleteObservers());
+
         servers.forEach(Server::clockOut);
+
         assistants.forEach(Assistant::clockOut);
         dashboard.shutdown();
     }

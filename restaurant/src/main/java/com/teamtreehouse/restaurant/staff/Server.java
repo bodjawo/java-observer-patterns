@@ -2,10 +2,13 @@ package com.teamtreehouse.restaurant.staff;
 
 import com.teamtreehouse.restaurant.tables.Status;
 import com.teamtreehouse.restaurant.tables.Table;
+import javafx.scene.control.Tab;
 
+import java.util.Observable;
 import java.util.Random;
 
 import static com.teamtreehouse.restaurant.core.Utilities.passTime;
+import static com.teamtreehouse.restaurant.tables.Status.AVAILABLE;
 
 public class Server extends Employee {
     public Server(String name) {
@@ -37,5 +40,18 @@ public class Server extends Employee {
             table.setStatus(Status.NEEDS_BUSSING);
         });
 
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        Table table = (Table) o;
+        switch (table.getStatus()) {
+            case AVAILABLE:
+                leadToTable(table);
+                break;
+            case FINISHED:
+                closeOutTable(table);
+                break;
+        }
     }
 }
